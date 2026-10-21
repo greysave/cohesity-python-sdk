@@ -20,7 +20,7 @@ dev = ["pytest>=7", "ruff", "openpyxl>=3.1"]
 where = ["src"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src", "."]
+pythonpath = ["src", ".", "examples"]
 testpaths = ["tests"]
 
 [tool.ruff]

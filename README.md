@@ -56,11 +56,52 @@ Representative results:
 The example makes no network requests and uses no real identifiers, credentials, or
 measurements. See [the walkthrough and full output](docs/EXAMPLE.md).
 
+## Step-by-step examples
+
+Six short scripts in [`examples/`](examples/) cover the common tasks. They use the live
+API paths, but this sanitized release has only been tested with mocked responses so far.
+Run them first with a read-only account on a permitted nonproduction cluster.
+
+**Install** (Python 3.9+; run from the repository root):
+
+```console
+pip install -e ".[excel]"        # library + pandas + requests, plus openpyxl for .xlsx output
+```
+
+**Connection settings come from environment variables.** The examples do not print or write
+the password or bearer token:
+
+```console
+export COHESITY_HOST=cluster.example.com
+export COHESITY_USER=<your user>
+export COHESITY_PASSWORD=<your password>
+export COHESITY_DOMAIN=LOCAL                  # optional, default LOCAL
+export COHESITY_CA_BUNDLE=/path/to/ca.pem     # optional, for a private certificate authority
+```
+
+TLS verification is always on in the examples. Each script imports the package as
+`from cohesity_rest_helper import ...`, so install it first; run the scripts from the
+repository root, e.g. `python examples/warm_storage.py --days 30`.
+
+| Script | What it shows |
+|---|---|
+| `auth_cluster_info.py` | Log in and read cluster name, ID and software version |
+| `tenants_and_vaults.py` | List tenant IDs and vaults (external targets) |
+| `warm_storage.py` | Warm tier: physical, written and logical bytes per tenant |
+| `replica_and_view_tiers.py` | Replica and view (cold) tiers per tenant |
+| `vault_consumption.py` | Consumption per vault (cluster-wide) |
+| `full_tier_workbook.py` | All tiers into one eight-sheet Excel workbook (`--output`, `--force`) |
+
+`example_support.py` holds the shared environment/login/time-window helpers. Exported
+workbooks describe your cluster, so keep them out of version control (`.gitignore` already
+excludes `*.xlsx` and `*.csv`).
+
 ## Security defaults
 
 * TLS certificate verification is **on** by default. For a private CA pass
   `verify="/path/to/ca.pem"`. `verify=False` must be requested explicitly.
-* Credentials are passed as arguments, never stored on objects, logged, or put in errors.
+* The authentication object does not retain the username or password. API client objects keep
+  the bearer token in memory for request headers; examples do not print it or include it in errors.
 * Every request has a timeout (default 60 s).
 * Errors raise `CohesityAPIError` (a `ValueError`) carrying only the HTTP status.
 
@@ -71,4 +112,4 @@ pip install -e ".[dev]"
 pytest
 ruff check .
 ```
-Tests mock `requests` and use only synthetic data; no cluster is contacted.
+Tests mock `requests` and use only synthetic data; no cluster is contacted. They also run every script in `examples/` against a fake cluster (`tests/example_fakes.py`).
