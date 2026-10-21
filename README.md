@@ -15,7 +15,7 @@ protection / storage statistics over its REST API.
 | `cohesity_tenant` | `CohesityTenants.get_tenants()` |
 | `cohesity_cluster` | `CohesityClusterObject.get_cluster_info()` |
 | `cohesity_vaults` | `CohesityProtectionVaultObject.get_vaults()` |
-| `csv_export` | `CSVData.save_as_excel()` writes the frames to one workbook |
+| `csv_export` | `CSVData.save_as_excel()` writes one workbook; `save_as_csv_files()` writes eight safe CSV files |
 
 ## Usage
 
@@ -35,6 +35,26 @@ ids = tenants.get_tenants()
 
 For consumption stats, set `api_payload["tenantIds"]`, `start_time` and `end_time`
 (epoch ms), then call `get_protection_jobs()`, `get_storage_consumed()`, etc.
+
+## Synthetic end-to-end report
+
+A runnable offline example demonstrates the complete tenant storage-reporting flow with
+fully invented data. It discovers synthetic tenants, protection jobs, replicas, views,
+and cluster-level vaults, then creates an Excel workbook and eight CSV files.
+
+```console
+python examples/tenant_storage_report.py --output /tmp/synthetic-report
+```
+
+Representative results:
+
+| Tenant | Physical | Written | Logical |
+|---|---:|---:|---:|
+| tenant-aurora | 900 GiB | 1,250 GiB | 2,500 GiB |
+| tenant-beacon | 500 GiB | 700 GiB | 1,400 GiB |
+
+The example makes no network requests and uses no real identifiers, credentials, or
+measurements. See [the walkthrough and full output](docs/EXAMPLE.md).
 
 ## Security defaults
 

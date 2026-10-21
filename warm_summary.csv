@@ -1,0 +1,3 @@
+Tenant Name,Warm Storage Consumed,Warm Data Written,Warm Logical Usage
+tenant-aurora,966367641600,1342177280000,2684354560000
+tenant-beacon,536870912000,751619276800,1503238553600
