@@ -120,8 +120,8 @@ class CohesityProtectionStatsObject:
 
     @staticmethod
     def _latest_sum(frame: pd.DataFrame, column: str) -> pd.DataFrame:
-        """Latest data point per job, summed per tenant."""
-        latest = frame.drop_duplicates(subset="Job Name", keep="last")
+        """Latest data point per tenant and job, summed per tenant."""
+        latest = frame.drop_duplicates(subset=["Tenant ID", "Job Name"], keep="last")
         return latest.groupby(["Tenant Name"])[column].sum().reset_index()
 
     def _first_metric(self, stats_key, metric, column):

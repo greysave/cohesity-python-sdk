@@ -33,21 +33,27 @@ class CSVData:
         """Write all frames to an .xlsx workbook, one sheet each (requires openpyxl)."""
         with pd.ExcelWriter(reportname) as writer:  # pylint: disable=abstract-class-instantiated
             for sheet_name, _, frame in self._sheets():
-                frame.to_excel(writer, sheet_name=sheet_name, index=False)
+                self._formula_safe(frame).to_excel(writer, sheet_name=sheet_name, index=False)
 
     @staticmethod
-    def _csv_safe(frame: pd.DataFrame) -> pd.DataFrame:
-        """Copy a frame, add UTC timestamps, and neutralize spreadsheet formulas."""
+    def _formula_safe(frame: pd.DataFrame) -> pd.DataFrame:
+        """Copy a frame and neutralize values that spreadsheets may treat as formulas."""
         safe = frame.copy()
-        if "Time" in safe.columns:
-            safe["Time (UTC)"] = pd.to_datetime(safe["Time"], unit="ms", utc=True).dt.strftime(
-                "%Y-%m-%dT%H:%M:%SZ"
-            )
         for column in safe.select_dtypes(include=["object", "string"]).columns:
             safe[column] = safe[column].map(
                 lambda value: "'" + value
                 if isinstance(value, str) and value.startswith(("=", "+", "-", "@"))
                 else value
+            )
+        return safe
+
+    @classmethod
+    def _csv_safe(cls, frame: pd.DataFrame) -> pd.DataFrame:
+        """Copy a frame, add UTC timestamps, and neutralize spreadsheet formulas."""
+        safe = cls._formula_safe(frame)
+        if "Time" in safe.columns:
+            safe["Time (UTC)"] = pd.to_datetime(safe["Time"], unit="ms", utc=True).dt.strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
             )
         return safe
 
