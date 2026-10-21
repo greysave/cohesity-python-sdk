@@ -9,7 +9,9 @@ Source dir: `cohesity_api_helper/` (private, quarantined). Release package: `src
 | `cohesity_tenant.py` | `cohesity_tenant.py` | Uses shared `_get_json`; annotated as returning a list of tenant IDs |
 | `cohesity_cluster.py` | `cohesity_cluster.py` | Class renamed `CohesityClusterObject` (typo fix); now also returns the payload |
 | `cohesity_vaults.py` | `cohesity_vaults.py` | Uses shared `_get_json` |
-| `csv_export.py` | `csv_export.py` | Proper dataclass fields; `save_as_excel` added, `save_as_csv` kept as alias (it always wrote .xlsx) |
+| `csv_export.py` | `csv_export.py` | Proper dataclass fields; `save_as_excel` added, `save_as_csv` kept as alias (it always wrote .xlsx); public release later added safe multi-file CSV export with UTC timestamps and formula neutralization |
 | `__init__.py` (empty) | `__init__.py` | Public exports |
 
 Removed entirely: customer/chargeback workflow code, reports, venv, Dockerfile, real identifiers.
+
+`examples/tenant_storage_report.py`, `docs/EXAMPLE.md`, and `examples/sample_output/` are new public-release material built from invented fixtures. They demonstrate the generic inventory-and-capacity sequence without copying a customer report or its data.
