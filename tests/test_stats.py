@@ -98,3 +98,12 @@ def test_excel_export(tmp_path):
     assert set(pd.read_excel(out, sheet_name=None)) == {
         "Warm Granular", "Warm Sum", "Replica Granular", "Replica Sum",
         "Cold Granular", "Cold Sum", "Frozen Granular", "Frozen Sum"}
+
+
+def test_excel_export_neutralizes_formula_like_names(tmp_path):
+    frame = pd.DataFrame({"Tenant Name": ["=1+1", "+SUM(A1:A2)", "safe-name"]})
+    data = CSVData(*([frame] * 8))
+    out = tmp_path / "safe.xlsx"
+    data.save_as_excel(str(out))
+    values = pd.read_excel(out, sheet_name="Warm Granular")["Tenant Name"].tolist()
+    assert values == ["'=1+1", "'+SUM(A1:A2)", "safe-name"]
